@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  name          String
+  role          String    @default("user") // "user" | "admin"
+  avatar        String?
+  bio           String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  articles        Article[]
+  comments        Comment[]
+  galleryImages   GalleryImage[]
+}
+
+model Article {
+  id            String    @id @default(cuid())
+  title         String
+  slug          String    @unique
+  content       String
+  summary       String?
+  coverImage    String?
+  category      String?
+  tags          String    // JSON array string
+  visibility    String    @default("public") // "public" | "auth_only" | "private"
+  status        String    @default("published") // "draft" | "published"
+  viewCount     Int       @default(0)
+  likeCount     Int       @default(0)
+  authorId      String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  author        User      @relation(fields: [authorId], references: [id])
+  comments      Comment[]
+}
+
+model Comment {
+  id            String    @id @default(cuid())
+  content       String
+  articleId     String
+  userId        String?
+  guestName     String?
+  guestEmail    String?
+  parentId      String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  article       Article   @relation(fields: [articleId], references: [id])
+  user          User?     @relation(fields: [userId], references: [id])
+  parent        Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies       Comment[] @relation("CommentReplies")
+}
+
+model GalleryImage {
+  id          String   @id @default(cuid())
+  url         String
+  title       String
+  tag         String   @default("")   // 标签，默认为空
+  authorId    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  author      User     @relation(fields: [authorId], references: [id])
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SiteSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}
