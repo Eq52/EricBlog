@@ -6,6 +6,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --default-font-family: var(--font-noto-serif), "Noto Serif SC", "Source Han Serif SC", "STSong", "SimSun", "Songti SC", serif;
   --font-sans: var(--font-noto-serif), "Noto Serif SC", "Source Han Serif SC", "STSong", "SimSun", "Songti SC", serif;
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -133,7 +134,7 @@
 
 /* Global serif font — outside @layer to override Tailwind preflight */
 html, body {
-  font-family: var(--font-sans) !important;
+  font-family: var(--font-noto-serif), "Noto Serif SC", "Source Han Serif SC", "STSong", "SimSun", "Songti SC", serif !important;
 }
 
 /* Article content - prose-like styling */
