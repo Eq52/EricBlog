@@ -6,7 +6,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-noto-serif), "Noto Serif SC", "Source Han Serif SC", "STSong", "SimSun", "Songti SC", serif;
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -127,6 +127,8 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+    font-variant-ligatures: common-ligatures contextual;
   }
 }
 
@@ -140,133 +142,266 @@
   color: oklch(0.82 0 0);
 }
 
-/* ===== GitHub Alerts (GFM Callouts) ===== */
-.github-alert {
+/* ===== Math (KaTeX) Styling ===== */
+.article-content .math {
+  font-size: 1.05em;
+}
+.article-content .math-display {
   margin: 1.5rem 0;
-  padding: 1rem 1.25rem;
-  border-left: 4px solid;
-  border-radius: 0 0.5rem 0.5rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.75rem 0;
+  text-align: center;
 }
-.github-alert-title {
-  font-weight: 700;
-  font-size: 0.8125rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.25rem;
+.article-content .math-inline {
+  padding: 0 0.15em;
 }
-.github-alert-body {
-  font-size: 0.9375rem;
+/* KaTeX block centering */
+.article-content .katex-display {
+  margin: 1.25rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.5rem 0;
+}
+.article-content .katex {
+  font-size: 1.05em !important;
+}
+.article-content .katex-display > .katex {
+  font-size: 1.15em !important;
+}
+
+/* ===== Footnotes (remark-footnotes) ===== */
+.article-content .footnotes {
+  margin-top: 2.5rem;
+  padding-top: 1.25rem;
+  border-top: 2px solid oklch(0.88 0 0);
+  font-size: 0.875rem;
   line-height: 1.7;
 }
-.github-alert-body > p { margin: 0; }
-.github-alert-body > p + p { margin-top: 0.5rem; }
+.dark .article-content .footnotes {
+  border-top-color: oklch(0.25 0 0);
+}
+.article-content .footnotes ol {
+  padding-left: 1.5rem;
+}
+.article-content .footnotes li {
+  margin-bottom: 0.5rem;
+}
+.article-content .footnotes p {
+  margin: 0.25rem 0;
+  font-size: 0.875rem;
+}
+/* Footnote back-reference icon */
+.article-content .footnotes a[data-footnote-backref] {
+  font-size: 0.8em;
+  text-decoration: none;
+  color: inherit;
+  opacity: 0.5;
+  margin-left: 0.25rem;
+}
+.article-content .footnotes a[data-footnote-backref]:hover {
+  opacity: 1;
+}
+/* Footnote ref superscript */
+.article-content sup a[data-footnote-ref] {
+  font-weight: 600;
+  text-decoration: none;
+  color: oklch(0.55 0.15 290);
+  transition: color 0.2s ease;
+}
+.article-content sup a[data-footnote-ref]:hover {
+  color: oklch(0.45 0.2 290);
+}
+.dark .article-content sup a[data-footnote-ref] {
+  color: oklch(0.7 0.15 290);
+}
+.dark .article-content sup a[data-footnote-ref]:hover {
+  color: oklch(0.8 0.2 290);
+}
 
-/* NOTE — blue */
-.github-alert-note {
+/* ===== Emoji Styling ===== */
+.article-content .emoji {
+  font-style: normal;
+  vertical-align: -0.1em;
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+.article-content .emoji:hover {
+  transform: scale(1.25);
+}
+
+/* ===== GitHub Alerts (via remark-github-blockquote-alert) ===== */
+.markdown-alert {
+  position: relative;
+  margin: 1.5rem 0;
+  padding: 1rem 1.25rem 1.125rem;
+  border-left: 4px solid;
+  border-radius: 0 0.625rem 0.625rem 0;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.markdown-alert:hover {
+  transform: translateX(2px);
+  box-shadow: 0 2px 12px oklch(0 0 0 / 6%);
+}
+.dark .markdown-alert:hover {
+  box-shadow: 0 2px 12px oklch(0 0 0 / 20%);
+}
+
+/* Alert title — SVG icon + label text */
+.markdown-alert-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+.markdown-alert-title .octicon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+/* Body paragraphs */
+.markdown-alert > p:last-child {
+  margin-bottom: 0;
+}
+.markdown-alert > p {
+  font-size: 0.9375rem;
+  line-height: 1.75;
+  margin-bottom: 0.5rem;
+}
+
+/* ===== NOTE — blue ===== */
+.markdown-alert-note {
   border-color: #0969da;
-  background: oklch(0.97 0.008 240);
+  background: oklch(0.975 0.01 240);
 }
-.github-alert-note .github-alert-title { color: #0969da; }
-
-/* TIP — green */
-.github-alert-tip {
-  border-color: #1a7f37;
-  background: oklch(0.97 0.008 150);
+.markdown-alert-note .markdown-alert-title {
+  color: #0969da;
 }
-.github-alert-tip .github-alert-title { color: #1a7f37; }
-
-/* IMPORTANT — purple */
-.github-alert-important {
-  border-color: #8250df;
-  background: oklch(0.97 0.008 295);
-}
-.github-alert-important .github-alert-title { color: #8250df; }
-
-/* WARNING — amber */
-.github-alert-warning {
-  border-color: #9a6700;
-  background: oklch(0.97 0.015 85);
-}
-.github-alert-warning .github-alert-title { color: #9a6700; }
-
-/* CAUTION — red */
-.github-alert-caution {
-  border-color: #cf222e;
-  background: oklch(0.97 0.015 25);
-}
-.github-alert-caution .github-alert-title { color: #cf222e; }
-
-/* Dark mode alerts */
-.dark .github-alert-note {
+.dark .markdown-alert-note {
   border-color: #58a6ff;
-  background: oklch(0.16 0.015 240);
+  background: oklch(0.14 0.02 240);
 }
-.dark .github-alert-note .github-alert-title { color: #58a6ff; }
+.dark .markdown-alert-note .markdown-alert-title {
+  color: #58a6ff;
+}
 
-.dark .github-alert-tip {
+/* ===== TIP — green ===== */
+.markdown-alert-tip {
+  border-color: #1a7f37;
+  background: oklch(0.975 0.01 150);
+}
+.markdown-alert-tip .markdown-alert-title {
+  color: #1a7f37;
+}
+.dark .markdown-alert-tip {
   border-color: #3fb950;
-  background: oklch(0.16 0.015 150);
+  background: oklch(0.14 0.02 150);
 }
-.dark .github-alert-tip .github-alert-title { color: #3fb950; }
+.dark .markdown-alert-tip .markdown-alert-title {
+  color: #3fb950;
+}
 
-.dark .github-alert-important {
+/* ===== IMPORTANT — purple ===== */
+.markdown-alert-important {
+  border-color: #8250df;
+  background: oklch(0.975 0.01 295);
+}
+.markdown-alert-important .markdown-alert-title {
+  color: #8250df;
+}
+.dark .markdown-alert-important {
   border-color: #bc8cff;
-  background: oklch(0.16 0.015 295);
+  background: oklch(0.14 0.02 295);
 }
-.dark .github-alert-important .github-alert-title { color: #bc8cff; }
+.dark .markdown-alert-important .markdown-alert-title {
+  color: #bc8cff;
+}
 
-.dark .github-alert-warning {
+/* ===== WARNING — amber ===== */
+.markdown-alert-warning {
+  border-color: #9a6700;
+  background: oklch(0.975 0.018 85);
+}
+.markdown-alert-warning .markdown-alert-title {
+  color: #9a6700;
+}
+.dark .markdown-alert-warning {
   border-color: #d29922;
-  background: oklch(0.16 0.02 85);
+  background: oklch(0.14 0.025 85);
 }
-.dark .github-alert-warning .github-alert-title { color: #d29922; }
+.dark .markdown-alert-warning .markdown-alert-title {
+  color: #d29922;
+}
 
-.dark .github-alert-caution {
+/* ===== CAUTION — red ===== */
+.markdown-alert-caution {
+  border-color: #cf222e;
+  background: oklch(0.975 0.018 25);
+}
+.markdown-alert-caution .markdown-alert-title {
+  color: #cf222e;
+}
+.dark .markdown-alert-caution {
   border-color: #f85149;
-  background: oklch(0.16 0.02 25);
+  background: oklch(0.14 0.025 25);
 }
-.dark .github-alert-caution .github-alert-title { color: #f85149; }
+.dark .markdown-alert-caution .markdown-alert-title {
+  color: #f85149;
+}
 
-/* ===== Task List (GFM Checkboxes) ===== */
+/* ===== Task List (GFM Checkboxes) — Enhanced ===== */
 .task-list-checkbox {
   appearance: none;
   -webkit-appearance: none;
-  width: 1rem;
-  height: 1rem;
-  border: 2px solid oklch(0.65 0 0);
-  border-radius: 0.25rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  border: 2px solid oklch(0.6 0 0);
+  border-radius: 0.3rem;
   margin-right: 0.5rem;
   flex-shrink: 0;
   position: relative;
   top: 0.15rem;
   cursor: default;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   background: transparent;
+  box-shadow: 0 1px 2px oklch(0 0 0 / 5%);
+}
+.task-list-checkbox:hover {
+  border-color: oklch(0.5 0.05 var(--accent-h));
+  box-shadow: 0 1px 4px oklch(0 0 0 / 10%);
 }
 .task-list-checkbox:checked {
-  background: oklch(0.35 0 0);
-  border-color: oklch(0.35 0 0);
+  background: oklch(0.5 0.12 var(--accent-h));
+  border-color: oklch(0.5 0.12 var(--accent-h));
+  box-shadow: 0 1px 4px oklch(0.5 0.12 var(--accent-h) / 25%);
 }
 .task-list-checkbox:checked::after {
   content: '';
   position: absolute;
-  left: 0.15rem;
+  left: 0.2rem;
   top: 0rem;
   width: 0.4rem;
-  height: 0.6rem;
+  height: 0.65rem;
   border: solid white;
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
 }
 .dark .task-list-checkbox {
   border-color: oklch(0.5 0 0);
+  box-shadow: 0 1px 2px oklch(0 0 0 / 15%);
+}
+.dark .task-list-checkbox:hover {
+  border-color: oklch(0.65 0.05 var(--accent-h));
 }
 .dark .task-list-checkbox:checked {
-  background: oklch(0.92 0 0);
-  border-color: oklch(0.92 0 0);
+  background: oklch(0.65 0.12 var(--accent-h));
+  border-color: oklch(0.65 0.12 var(--accent-h));
 }
 .dark .task-list-checkbox:checked::after {
-  border-color: oklch(0.15 0 0);
+  border-color: oklch(0.1 0 0);
 }
 
 .article-content .task-list-item {
@@ -280,7 +415,129 @@
   padding-left: 1.5rem;
 }
 
-/* ===== Footnotes ===== */
+/* ===== Details / Summary — Enhanced ===== */
+.md-details {
+  position: relative;
+  margin: 1.5rem 0;
+  border: 1px solid oklch(0.88 0 0);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: oklch(0.99 0 0);
+  box-shadow: 0 1px 4px oklch(0 0 0 / 4%);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.md-details:hover {
+  box-shadow: 0 2px 8px oklch(0 0 0 / 7%);
+}
+.dark .md-details {
+  border-color: oklch(0.25 0 0);
+  background: oklch(0.14 0 0);
+  box-shadow: 0 1px 4px oklch(0 0 0 / 15%);
+}
+.dark .md-details:hover {
+  box-shadow: 0 2px 8px oklch(0 0 0 / 25%);
+}
+.md-details[open] {
+  border-color: oklch(0.65 0.08 var(--accent-h));
+  box-shadow: 0 2px 12px oklch(0 0 0 / 6%);
+}
+.dark .md-details[open] {
+  border-color: oklch(0.45 0.08 var(--accent-h));
+  box-shadow: 0 2px 12px oklch(0 0 0 / 20%);
+}
+
+/* Summary — chevron icon + text */
+.md-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: oklch(0.3 0 0);
+  user-select: none;
+  list-style: none;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.md-summary::-webkit-details-marker {
+  display: none;
+}
+.md-summary::marker {
+  display: none;
+  content: '';
+}
+.md-summary:hover {
+  background: oklch(0.96 0.005 var(--accent-h));
+  color: oklch(0.22 0 0);
+}
+.dark .md-summary {
+  color: oklch(0.88 0 0);
+}
+.dark .md-summary:hover {
+  background: oklch(0.2 0.01 var(--accent-h));
+  color: oklch(0.95 0 0);
+}
+
+/* Chevron — rotates when open */
+.md-summary-chevron {
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  color: oklch(0.55 0.05 var(--accent-h));
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease;
+}
+.md-summary:hover .md-summary-chevron {
+  color: oklch(0.45 0.1 var(--accent-h));
+}
+.dark .md-summary-chevron {
+  color: oklch(0.6 0.05 var(--accent-h));
+}
+.dark .md-summary:hover .md-summary-chevron {
+  color: oklch(0.7 0.1 var(--accent-h));
+}
+.md-details[open] > .md-summary .md-summary-chevron {
+  transform: rotate(90deg);
+}
+
+/* Summary text */
+.md-summary-text {
+  flex: 1;
+  line-height: 1.5;
+}
+
+/* Details body content */
+.md-details > :not(summary) {
+  padding: 0 1rem 1rem;
+}
+.md-details > :not(summary):first-of-type {
+  padding-top: 0;
+}
+/* Add top divider when open */
+.md-details[open] > :not(summary):first-of-type {
+  padding-top: 0.75rem;
+  margin-top: 0;
+  border-top: 1px solid oklch(0.9 0 0);
+  padding-top: 0.875rem;
+}
+.dark .md-details[open] > :not(summary):first-of-type {
+  border-top-color: oklch(0.25 0 0);
+}
+
+/* Nested details */
+.md-details .md-details {
+  margin: 0.75rem 0;
+  border-color: oklch(0.9 0 0);
+}
+.dark .md-details .md-details {
+  border-color: oklch(0.28 0 0);
+}
+.md-details .md-details > .md-summary {
+  font-size: 0.875rem;
+  padding: 0.625rem 0.875rem;
+}
+
+/* ===== Footnotes (sr-only for accessibility) ===== */
 .article-content .footnotes {
   margin-top: 2rem;
   padding-top: 1rem;
@@ -550,4 +807,257 @@ html {
   .dark .skeleton-shimmer::after {
     background: oklch(1 0 0 / 8%);
   }
+}
+
+/* ===== Enhanced Markdown Typography ===== */
+
+/* Headings with gradient accent */
+.article-content h1 {
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+.article-content h1::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, oklch(0.6 0.2 var(--accent-h)), oklch(0.7 0.15 var(--accent-h)));
+  border-radius: 2px;
+}
+.article-content h2 {
+  position: relative;
+}
+.article-content h2::before {
+  content: '';
+  position: absolute;
+  left: -1.25rem;
+  top: 0.15em;
+  width: 4px;
+  height: 1.2em;
+  background: linear-gradient(180deg, oklch(0.6 0.2 var(--accent-h)), transparent);
+  border-radius: 2px;
+}
+
+/* Enhanced paragraph spacing */
+.article-content p + p {
+  margin-top: 0.75rem;
+}
+
+/* Enhanced links with animated underline */
+.article-content a {
+  position: relative;
+  background-image: linear-gradient(oklch(0.5 0.15 var(--accent-h)), oklch(0.5 0.15 var(--accent-h)));
+  background-size: 0% 1px;
+  background-position: left bottom;
+  background-repeat: no-repeat;
+  transition: background-size 0.3s ease, color 0.2s ease;
+}
+.article-content a:hover {
+  background-size: 100% 1px;
+}
+
+/* Enhanced blockquote with left gradient bar */
+.article-content blockquote {
+  position: relative;
+  border-left: none !important;
+}
+.article-content blockquote::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, oklch(0.6 0.2 var(--accent-h)), oklch(0.7 0.1 var(--accent-h) / 30%));
+  border-radius: 2px;
+}
+
+/* Enhanced lists with custom markers */
+.article-content ul:not(.contains-task-list) {
+  list-style-type: none;
+  padding-left: 1.5rem;
+}
+.article-content ul:not(.contains-task-list) li {
+  position: relative;
+}
+.article-content ul:not(.contains-task-list) li::before {
+  content: '';
+  position: absolute;
+  left: -1rem;
+  top: 0.55em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: oklch(0.6 0.15 var(--accent-h));
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.article-content ul:not(.contains-task-list) li:hover::before {
+  transform: scale(1.4);
+  background: oklch(0.55 0.2 var(--accent-h));
+}
+.article-content ol {
+  counter-reset: ol-counter;
+  padding-left: 1.5rem;
+}
+.article-content ol li {
+  counter-increment: ol-counter;
+  list-style: none;
+  position: relative;
+}
+.article-content ol li::before {
+  content: counter(ol-counter);
+  position: absolute;
+  left: -1.5rem;
+  top: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: oklch(0.94 0.01 var(--accent-h));
+  color: oklch(0.5 0.15 var(--accent-h));
+  font-size: 0.7em;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+.article-content ol li:hover::before {
+  background: oklch(0.5 0.15 var(--accent-h));
+  color: white;
+  transform: scale(1.1);
+}
+.dark .article-content ol li::before {
+  background: oklch(0.25 0.02 var(--accent-h));
+  color: oklch(0.7 0.15 var(--accent-h));
+}
+.dark .article-content ol li:hover::before {
+  background: oklch(0.7 0.15 var(--accent-h));
+  color: oklch(0.1 0 0);
+}
+
+/* Enhanced table with hover effects */
+.article-content table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+.article-content th {
+  position: relative;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  color: oklch(0.35 0 0);
+}
+.dark .article-content th {
+  color: oklch(0.85 0 0);
+}
+.article-content td {
+  transition: background-color 0.15s ease;
+}
+.article-content tr:hover td {
+  background: oklch(0.96 0.01 var(--accent-h) / 50%);
+}
+.dark .article-content tr:hover td {
+  background: oklch(0.2 0.015 var(--accent-h) / 50%);
+}
+
+/* Enhanced horizontal rule */
+.article-content hr {
+  border: none;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent,
+    oklch(0.6 0.15 var(--accent-h) / 40%),
+    oklch(0.6 0.15 var(--accent-h) / 60%),
+    oklch(0.6 0.15 var(--accent-h) / 40%),
+    transparent
+  );
+  margin: 2.5rem 0;
+  border-radius: 1px;
+}
+
+/* Enhanced inline code */
+.article-content code:not(pre code) {
+  position: relative;
+  background: oklch(0.96 0.01 var(--accent-h));
+  color: oklch(0.4 0.1 var(--accent-h));
+  border: 1px solid oklch(0.85 0.02 var(--accent-h));
+  border-radius: 0.375rem;
+  padding: 0.15em 0.45em;
+  font-size: 0.875em;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+.article-content code:not(pre code):hover {
+  background: oklch(0.92 0.02 var(--accent-h));
+  border-color: oklch(0.7 0.05 var(--accent-h));
+}
+.dark .article-content code:not(pre code) {
+  background: oklch(0.22 0.015 var(--accent-h));
+  color: oklch(0.8 0.1 var(--accent-h));
+  border-color: oklch(0.3 0.02 var(--accent-h));
+}
+.dark .article-content code:not(pre code):hover {
+  background: oklch(0.28 0.02 var(--accent-h));
+  border-color: oklch(0.45 0.05 var(--accent-h));
+}
+
+/* Enhanced images with subtle shadow */
+.article-content img {
+  border-radius: 0.75rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 20px oklch(0 0 0 / 8%);
+}
+.article-content img:hover {
+  transform: scale(1.01);
+  box-shadow: 0 8px 30px oklch(0 0 0 / 12%);
+}
+.dark .article-content img {
+  box-shadow: 0 4px 20px oklch(0 0 0 / 30%);
+}
+.dark .article-content img:hover {
+  box-shadow: 0 8px 30px oklch(0 0 0 / 45%);
+}
+
+/* Strong text with subtle color tint */
+.article-content strong {
+  color: oklch(0.2 0 0);
+  text-shadow: 0 0 0 oklch(0.6 0.15 var(--accent-h) / 15%);
+}
+.dark .article-content strong {
+  color: oklch(0.95 0 0);
+}
+
+/* Mark / highlight text */
+.article-content mark {
+  background: oklch(0.85 0.15 85);
+  color: inherit;
+  padding: 0.1em 0.3em;
+  border-radius: 0.25rem;
+}
+
+/* Definition lists */
+.article-content dl {
+  border-left: 3px solid oklch(0.85 0.02 var(--accent-h));
+  padding-left: 1rem;
+  margin: 1.5rem 0;
+}
+.article-content dt {
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  color: oklch(0.25 0 0);
+}
+.dark .article-content dt {
+  color: oklch(0.9 0 0);
+}
+.article-content dd {
+  margin-bottom: 0.75rem;
+  color: oklch(0.45 0 0);
+}
+.dark .article-content dd {
+  color: oklch(0.75 0 0);
 }

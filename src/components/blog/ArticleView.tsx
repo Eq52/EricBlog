@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useMemo, useRef, Children, isValidElement, type ReactNode } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import ReactMarkdown from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
@@ -20,6 +20,7 @@ import {
   Sparkles,
   Copy,
   Check,
+  ChevronRight,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -37,6 +38,11 @@ import { cn } from '@/lib/utils'
 import { useAppStore } from '@/store'
 import CommentSection from './CommentSection'
 import remarkGfm from 'remark-gfm'
+import remarkGithubBlockquoteAlert from 'remark-github-blockquote-alert'
+import remarkMath from 'remark-math'
+import remarkFootnotes from 'remark-footnotes'
+import remarkEmoji from 'remark-emoji'
+import rehypeKatex from 'rehype-katex'
 import rehypeSanitize from 'rehype-sanitize'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import rehypeRaw from 'rehype-raw'
@@ -70,56 +76,6 @@ interface TocItem {
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-/** GitHub Alert types mapping */
-const GITHUB_ALERTS: Record<string, string> = {
-  NOTE: 'github-alert-note',
-  TIP: 'github-alert-tip',
-  IMPORTANT: 'github-alert-important',
-  WARNING: 'github-alert-warning',
-  CAUTION: 'github-alert-caution',
-}
-
-/** Pre-process markdown: replace [!TYPE] alert markers with an HTML <div> marker.
- *  This survives the entire remark/rehype pipeline (rehype-raw parses it back into a hast element)
- *  so the blockquote component can reliably detect it by className.
- */
-function preprocessAlerts(content: string): string {
-  return content.replace(
-    /^(> )\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*(.*)$/gim,
-    (_match: string, prefix: string, type: string, rest: string) => {
-      const marker = `${prefix}<div class="github-alert-marker-${type.toUpperCase()}"></div>`
-      if (rest.trim()) {
-        return `${marker}\n${prefix}${rest}`
-      }
-      return marker
-    },
-  )
-}
-
-/** Detect GitHub Alert in blockquote children by looking for the injected HTML marker <div>.
- *  The marker was inserted by preprocessAlerts() and survives rehype-raw + rehype-sanitize.
- */
-function detectAlert(children: ReactNode): { type: string; body: ReactNode[] } | null {
-  const arr = Children.toArray(children)
-  for (let i = 0; i < arr.length; i++) {
-    const child = arr[i]
-    if (!isValidElement(child)) continue
-    const cls = String(child.props.className || '')
-    const match = cls.match(/github-alert-marker-(NOTE|TIP|IMPORTANT|WARNING|CAUTION)/i)
-    if (match) {
-      const type = match[1].toUpperCase()
-      // Body = everything after the marker, skip empty <p> elements
-      const body = arr.slice(i + 1).filter(c => {
-        if (!isValidElement(c)) return true
-        const kids = Children.toArray(c.props.children)
-        return kids.length > 0
-      })
-      return { type, body }
-    }
-  }
-  return null
-}
 
 /** Extract h2 / h3 headings from raw markdown (sequential IDs). */
 function extractHeadings(content: string): TocItem[] {
@@ -562,20 +518,32 @@ export default function ArticleView({ articleId }: ArticleViewProps) {
       {/* Article Content */}
       <article className="article-content mb-10">
         <ReactMarkdown
-          remarkPlugins={[remarkGfm]}
+          remarkPlugins={[remarkGithubBlockquoteAlert, remarkGfm, remarkMath, remarkFootnotes, remarkEmoji]}
           rehypePlugins={[
             rehypeRaw,
+            rehypeKatex,
             rehypeAutolinkHeadings,
             [
               rehypeSanitize,
               {
                 attributes: {
-                  '*': ['className', 'id'],
+                  '*': ['className', 'id', 'style', 'dir'],
                   a: ['href', 'target', 'rel', 'dataFootnoteRef', 'dataFootnoteBackref', 'ariaDescribedby', 'ariaLabel'],
                   img: ['src', 'alt', 'loading', 'className'],
                   code: ['className'],
                   pre: ['className'],
                   section: ['dataFootnotes'],
+                  span: ['className', 'style', 'dataKatexDisplay'],
+                  math: ['display', 'className'],
+                  svg: ['className', 'viewBox', 'width', 'height', 'ariaHidden', 'fill', 'stroke'],
+                  path: ['d'],
+                  div: ['className', 'dir'],
+                  annotation: ['encoding', 'src'],
+                  semantics: [], mrow: [], mi: [], mn: [], mo: [],
+                  msup: [], msub: [], msubsup: [], mfrac: [], msqrt: [], mroot: [],
+                  mtable: [], mtr: [], mtd: [],
+                  munder: [], mover: [], munderover: [],
+                  mspace: [], mtext: [], merror: [], mpadded: [], menclose: [],
                 },
               },
             ],
@@ -649,29 +617,27 @@ export default function ArticleView({ articleId }: ArticleViewProps) {
                 {children}
               </ol>
             ),
-            li: ({ children }) => (
-              <li className="leading-[1.85]">{children}</li>
-            ),
-            blockquote: ({ children }) => {
-              const alert = detectAlert(children)
-              if (alert) {
-                const cls = GITHUB_ALERTS[alert.type]
-                if (cls) {
-                  return (
-                    <div className={cn('github-alert', cls)}>
-                      <p className="github-alert-title">{alert.type}</p>
-                      {alert.body.length > 0 && (
-                        <div className="github-alert-body">{alert.body}</div>
-                      )}
-                    </div>
-                  )
-                }
-              }
+            li: ({ children, className }) => {
+              const isTaskItem = typeof className === 'string' && className.includes('task-list-item')
               return (
-                <blockquote className="my-6 border-l-4 border-foreground/20 bg-muted/40 py-4 pl-5 pr-5 italic text-muted-foreground [&>p]:text-base">
+                <li className={cn(
+                  'leading-[1.85]',
+                  isTaskItem && 'task-list-item'
+                )}>
                   {children}
-                </blockquote>
+                </li>
               )
+            },
+            blockquote: ({ children }) => (
+              <blockquote className="my-6 border-l-4 border-foreground/20 bg-muted/40 py-4 pl-5 pr-5 italic text-muted-foreground [&>p]:text-base">
+                {children}
+              </blockquote>
+            ),
+            div: ({ children, className, node, ...props }) => {
+              if (typeof className === 'string' && className.includes('markdown-alert')) {
+                return <div className={className} {...props}>{children}</div>
+              }
+              return <div className={className} {...props}>{children}</div>
             },
             a: ({ href, children }) => (
               <a
@@ -732,25 +698,20 @@ export default function ArticleView({ articleId }: ArticleViewProps) {
               }
               return <input className={className} {...props} />
             },
-            details: ({ children, ...props }) => (
-              <details
-                className="my-4 rounded-lg bg-muted/30 transition-colors open:bg-muted/50 dark:bg-neutral-800/30 dark:open:bg-neutral-700/30"
-                {...props}
-              >
+            details: ({ children, open, ...props }) => (
+              <details className="md-details" open={open} {...props}>
                 {children}
               </details>
             ),
-            summary: ({ children, ...props }) => (
-              <summary
-                className="cursor-pointer select-none px-4 py-2.5 text-sm font-medium text-foreground/70 transition-colors hover:bg-muted/50 hover:text-foreground dark:hover:bg-neutral-700/30"
-                {...props}
-              >
-                {children}
+            summary: ({ children }) => (
+              <summary className="md-summary">
+                <ChevronRight className="md-summary-chevron" strokeWidth={2.5} />
+                <span className="md-summary-text">{children}</span>
               </summary>
             ),
           }}
         >
-          {preprocessAlerts(article.content)}
+          {article.content}
         </ReactMarkdown>
       </article>
 
