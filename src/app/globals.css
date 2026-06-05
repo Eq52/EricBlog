@@ -127,9 +127,13 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-sans);
     font-variant-ligatures: common-ligatures contextual;
   }
+}
+
+/* Global serif font — outside @layer to override Tailwind preflight */
+html, body {
+  font-family: var(--font-sans) !important;
 }
 
 /* Article content - prose-like styling */
